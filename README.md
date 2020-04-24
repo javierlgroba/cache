@@ -5,8 +5,7 @@ Go in memory cache solution stores values in memory.
 - Concurrent cache.
 - Any type of data can be added to the same cache.
 - Only one cache object available.
-- Cache is removed automatically if the data has expired and it is time to clean.
-
+- Data is removed automatically from the cache if the data has expired and it is time to clean.
 ```go
 c := cache.New(timeToExpire, timeToClean) //To create the cache object.
 c.Add("key", data) //Adds the data with the specified key.

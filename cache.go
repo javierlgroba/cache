@@ -1,3 +1,8 @@
+// Copyright © 2020 Javier López Groba <javier.lopezgr@gmail.com>.
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file.
+
 //Package definition for the memory cache
 package cache
 
@@ -59,11 +64,33 @@ func New(expire, maid int) (*Cache){
     maid: maidDuration,
     isValid: false}
 
-  //TODO: Start background thread for maid
+  go callMaid(cache)
 
   //Set cache as valid before returning
   cache.isValid = true
   return cache
+}
+
+//maid Function
+func callMaid(c *Cache) {
+  //sleep for the time until the maid comes
+  time.Sleep( c.maid * time.Minute)
+  c.cacheMutex.Lock()
+  for c.isValid {
+    //Check if it is valid, if so clean
+    for key, value := range c.cache {
+        if value.expired(c) {
+          delete(c.cache, key)
+        }
+      }
+    //Unlock and sleep
+    c.cacheMutex.Unlock()
+    time.Sleep( c.maid * time.Minute)
+    //Lock, check if it is valid and clean
+    c.cacheMutex.Lock()
+  }
+  //release the mutex before leaving
+  c.cacheMutex.Unlock()
 }
 
 //Adds data to the cache

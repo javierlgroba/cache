@@ -1,2 +1,2 @@
 # cache
-Go local cache
+Go in memory cache solution

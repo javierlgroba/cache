@@ -37,9 +37,11 @@ var cache *Cache = &Cache{
 //When passing 0,0 default values are used.
 func New(expire, maid int) (*Cache){
   if expire==0 {
-    expire = defaultExpiringDuration}
+    expire = defaultExpiringDuration
+  }
   if maid==0 {
-    maid = defaultMaidDuration}
+    maid = defaultMaidDuration
+  }
 
   expireDuration, _ := time.ParseDuration(fmt.Sprintf("%dm", expire))
   maidDuration, _ := time.ParseDuration(fmt.Sprintf("%dm", maid))
@@ -52,6 +54,7 @@ func New(expire, maid int) (*Cache){
 
   //Create the new cache
   cache = &Cache{
+    cache: map[string]value{},
     expire: expireDuration,
     maid: maidDuration,
     isValid: false}
@@ -69,11 +72,12 @@ func (c *Cache) Add(key string, data interface{}) error{
   defer c.cacheMutex.Unlock()
 
   if !cache.isValid {
-    return errors.New("The cache is now invalid.")}
+    return errors.New("The cache is now invalid.")
+  }
 
   c.cache[key] = value{
     time: time.Now(),
-    value: &data}
+    value: data}
 
     return nil
 }
@@ -88,7 +92,8 @@ func (c *Cache) Remove(key string) error {
 
   _, ok := c.cache[key];
   if ok {
-    delete(c.cache, key)}
+    delete(c.cache, key)
+  }
 
   return nil
 }
@@ -99,13 +104,16 @@ func (c *Cache) Get(key string) (error, interface{}) {
   defer c.cacheMutex.Unlock()
 
   if !cache.isValid {
-    return errors.New("The cache is now invalid."), nil}
+    return errors.New("The cache is now invalid."), nil
+  }
 
   value, ok := c.cache[key];
   if ok {
     if value.expired(c){
-      return errors.New("The data has expired."), value.value}
-    return nil, value.value}
+      return errors.New("The data has expired."), value.value
+    }
+    return nil, value.value
+  }
 
   return errors.New("There is no value for the given key."), nil
 }

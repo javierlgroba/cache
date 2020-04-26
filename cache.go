@@ -117,10 +117,7 @@ func (c *Cache) Remove(key string) error {
   if !cache.isValid {
     return errors.New("The cache is now invalid.")}
 
-  _, ok := c.cache[key];
-  if ok {
-    delete(c.cache, key)
-  }
+  delete(c.cache, key)
 
   return nil
 }
